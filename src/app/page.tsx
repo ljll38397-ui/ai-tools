@@ -215,7 +215,7 @@ export default function Home() {
 
         </TabsContent>
       </Tabs>
-      <div className="flex flex-col items-end justify-end  w-[800px]  h-[300px] ">
+      <div className="flex flex-col items-end justify-end  w-[800px]  h-[200px] ">
         <ChatSection />
       </div>
 

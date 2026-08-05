@@ -11,18 +11,22 @@ import {
     Bubble,
     BubbleContent,
     BubbleGroup,
-    BubbleReactions,
+
 } from "@/components/ui/bubble"
-import { Send } from "lucide-react"
+import { MessageCircle, Send } from "lucide-react"
 import { useState } from "react"
+import { GoogleGenAI } from "@google/genai"
 type messagetype = {
     message: string;
     role: "USER" | "AI";
 }
+const client = new GoogleGenAI({
+    apiKey: process.env.NEXT_PUBLIC_Gemini_API_Key,
+})
 const ChatSection = () => {
     const [messages, setMessages] = useState<messagetype[] | undefined>();
     const [input, setInput] = useState("")
-    const sendMessage = () => {
+    const sendMessage = async () => {
         console.log("send message ajillaa")
         const newMessage: messagetype = {
             message: input,
@@ -35,8 +39,21 @@ const ChatSection = () => {
             return [newMessage]
         })
 
+        const ai = await client.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: input
+        });
+        setMessages((prev) => {
+            if (prev) {
+                return [...prev, { role: "AI", message: ai.text! }];
+            }
+            return [{ role: "AI", message: ai.text! }]
+        })
     }
-    const handleClick = (e) => {
+
+
+
+    const handleClick = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         console.log(e.key)
         if (e.key === "Enter") {
             sendMessage()
@@ -47,7 +64,7 @@ const ChatSection = () => {
     return <div>
         <Popover>
             <PopoverTrigger asChild >
-                <Button variant="outline">chate</Button>
+                <Button className="bg-black text-white " variant="outline"><MessageCircle></MessageCircle></Button>
             </PopoverTrigger>
             <PopoverContent>
                 <PopoverHeader>
@@ -64,7 +81,7 @@ const ChatSection = () => {
                             <Bubble align="end">
 
                             </Bubble>
-                            <Bubble variant="muted" align="end">
+                            <Bubble variant="muted" >
                                 <BubbleContent>
                                     {messages?.map((chat, index) => (
                                         <div key={index}>
